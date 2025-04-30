@@ -21,7 +21,7 @@ jobs:
       uses: docker/login-action@v3
       with:
         registry: ghcr.io
-        username: arnewaschenbach
+        username: arnewaeschenbach  # Kleingeschrieben!
         password: ${{ secrets.GHCR_PAT }}
 
     - name: Build and Push Docker Image
@@ -29,4 +29,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: ghcr.io/ArneWaeschenbach/nomnomnom:latest
+        tags: ghcr.io/arnewaeschenbach/nomnomnom:latest

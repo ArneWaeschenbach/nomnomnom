@@ -1,40 +1,43 @@
-name: Deploy to Server
+name: Build, Push and Deploy Elixir App
 
 on:
   push:
     branches:
-      - main  # Passe den Branch an, den du überwachen möchtest
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+
     steps:
-    - name: Checkout Code
+    - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up Elixir
-      uses: erlef/setup-beam@v1
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
       with:
-        elixir-version: '1.14.5' # Passe die Version an
-        otp-version: '25.0'      # Passe die Version an
+        registry: ghcr.io
+        username: arnewaeschenbach
+        password: ${{ secrets.GHCR_PAT }}
 
-    - name: Install Dependencies
-      run: |
-        mix local.hex --force
-        mix local.rebar --force
-        mix deps.get
-
-    - name: Build Release
-      run: |
-        MIX_ENV=prod mix release
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ghcr.io/arnewaeschenbach/nomnomnom:latest
 
     - name: Set up SSH
       uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Deploy to Server
+    - name: Trigger Kubernetes deployment restart
       run: |
-        scp _build/prod/rel/nomnomnom/releases/*/nomnomnom.tar.gz user@server:/path/to/deploy
-        ssh user@server "cd /path/to/deploy && tar -xzf nomnomnom.tar.gz && ./bin/nomnomnom start"
+        ssh -o StrictHostKeyChecking=no root@49.13.157.152 "
+          kubectl rollout restart deployment nomnomnom
+        "

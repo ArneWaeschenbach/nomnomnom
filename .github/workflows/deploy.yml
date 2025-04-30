@@ -1,0 +1,40 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main  # Passe den Branch an, den du überwachen möchtest
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up Elixir
+      uses: erlef/setup-beam@v1
+      with:
+        elixir-version: '1.14.5' # Passe die Version an
+        otp-version: '25.0'      # Passe die Version an
+
+    - name: Install Dependencies
+      run: |
+        mix local.hex --force
+        mix local.rebar --force
+        mix deps.get
+
+    - name: Build Release
+      run: |
+        MIX_ENV=prod mix release
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Deploy to Server
+      run: |
+        scp _build/prod/rel/nomnomnom/releases/*/nomnomnom.tar.gz user@server:/path/to/deploy
+        ssh user@server "cd /path/to/deploy && tar -xzf nomnomnom.tar.gz && ./bin/nomnomnom start"

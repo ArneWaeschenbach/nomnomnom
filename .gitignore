@@ -35,3 +35,5 @@ nomnomnom-*.tar
 npm-debug.log
 /assets/node_modules/
 
+
+k8s/cluster-issuer.yml

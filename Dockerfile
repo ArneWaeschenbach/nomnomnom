@@ -1,58 +1,64 @@
-# Build Stage
+# --- Build Stage ---
 FROM hexpm/elixir:1.17.2-erlang-27.0.1-debian-bookworm-20240722-slim AS build
 
-# System-Tools
+# System-Tools installieren
 RUN apt-get update && apt-get install -y \
     build-essential \
     git \
     curl \
-    && apt-get clean && rm -f /var/lib/apt/lists/*_*
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Projektverzeichnis
+# Arbeitsverzeichnis setzen
 WORKDIR /app
 
-# Hex & Rebar vorbereiten
+# Hex & Rebar installieren
 RUN mix local.hex --force && mix local.rebar --force
 
-# Mix-Dateien kopieren und Dependencies auflösen
+# Mix-Dateien und Konfiguration kopieren
 COPY mix.exs mix.lock ./
 COPY config ./config
+
+# Abhängigkeiten auflösen
 RUN MIX_ENV=prod mix deps.get
 
-# App-Code kopieren und kompilieren
+# Applikationscode kopieren
 COPY lib ./lib
 COPY priv ./priv
+
+# Kompilieren
 RUN MIX_ENV=prod mix compile
 
-# Assets überspringen, falls nicht vorhanden (kein npm, kein js)
+RUN MIX_ENV=prod mix phx.digest
 
 # Release bauen
 RUN MIX_ENV=prod mix release
 
+
 # --- Deployment Stage ---
 FROM debian:bookworm-slim AS app
 
-# Laufzeitabhängigkeiten
+# Laufzeitabhängigkeiten installieren
 RUN apt-get update && apt-get install -y \
     openssl \
     libstdc++6 \
     libssl-dev \
-    && apt-get clean && rm -f /var/lib/apt/lists/*_*
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Arbeitsverzeichnis & Umgebungsvariablen
+# Umgebungsvariablen & Arbeitsverzeichnis
 ENV LANG=C.UTF-8
 ENV HOME=/app
+ENV PHX_SERVER=true
 WORKDIR /app
 
-# Release aus vorherigem Build kopieren
-COPY --from=build /app/_build/prod/rel/* ./
+# Release kopieren
+COPY --from=build /app/_build/prod/rel/nomnomnom ./
 
-# User & Berechtigungen
+# Nutzer wechseln
 RUN chown -R nobody: .
 
 USER nobody
 
-# Port und Entrypoint
+# Port freigeben & Startkommando setzen
 EXPOSE 4000
 ENTRYPOINT ["/app/bin/nomnomnom"]
 CMD ["start"]

@@ -6,7 +6,18 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-    - host: nomnomnom.live
+    - host: nomnomnomh.eu
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nomnomnom
+                port:
+                  number: 80
+                             
+    - host: www.nomnomnomh.eu
       http:
         paths:
           - path: /

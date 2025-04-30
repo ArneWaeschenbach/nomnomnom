@@ -19,7 +19,7 @@ spec:
             - containerPort: 4000
           env:
             - name: PHX_HOST
-              value: "nomnomnom.live"
+              value: "nomnomnomh.eu"
             - name: DATABASE_URL
               value: "ecto://nomnomnom:secret@172.16.0.200:5432/nomnomnom_dev"
             - name: SECRET_KEY_BASE

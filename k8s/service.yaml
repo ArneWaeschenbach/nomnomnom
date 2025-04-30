@@ -6,5 +6,6 @@ spec:
   selector:
     app: nomnomnom
   ports:
-    - port: 80
+    - protocol: TCP
+      port: 80
       targetPort: 4000

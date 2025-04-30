@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nomnomnom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nomnomnom
+  template:
+    metadata:
+      labels:
+        app: nomnomnom
+    spec:
+      containers:
+        - name: nomnomnom
+          image: ghcr.io/arnewaschenbach/nomnomnom:latest
+          ports:
+            - containerPort: 4000
+          env:
+            - name: PHX_HOST
+              value: "nomnomnom.live"
+            - name: DATABASE_URL
+              value: "ecto://nomnomnom:secret@172.16.0.200:5432/nomnomnom_dev"
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: nomnomnom-secrets
+                  key: secret_key_base

@@ -54,5 +54,5 @@ USER nobody
 
 # Port und Entrypoint
 EXPOSE 4000
-ENTRYPOINT ["/app/bin/your_app_name"]
+ENTRYPOINT ["/app/bin/nomnomnom"]
 CMD ["start"]

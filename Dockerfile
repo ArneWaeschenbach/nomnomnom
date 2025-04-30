@@ -22,6 +22,8 @@ RUN mix local.hex --force
 RUN mix local.rebar --force
 
 WORKDIR /build
+
+COPY apps ./apps
 COPY config ./config
 COPY mix.exs .
 COPY mix.lock .

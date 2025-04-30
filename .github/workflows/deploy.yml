@@ -36,3 +36,4 @@ jobs:
         ssh -o StrictHostKeyChecking=no root@49.13.157.152 "
           kubectl rollout restart deployment nomnomnom
         "
+#test

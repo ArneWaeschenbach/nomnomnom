@@ -12,6 +12,8 @@ spec:
       labels:
         app: nomnomnom
     spec:
+      imagePullSecrets:
+        - name: ghcr-login
       containers:
         - name: nomnomnom
           image: ghcr.io/arnewaschenbach/nomnomnom:latest

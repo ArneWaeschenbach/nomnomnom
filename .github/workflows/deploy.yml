@@ -9,27 +9,22 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      packages: write
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Log in to GitHub Container Registry
+    - name: Log in to Docker Hub
       uses: docker/login-action@v3
       with:
-        registry: ghcr.io
-        username: arnewaeschenbach
-        password: ${{ secrets.GHCR_PAT }}
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
         context: .
         push: true
-        tags: ghcr.io/arnewaeschenbach/nomnomnom:latest
+        tags: arnewaschenbach/nomnomnom:latest
 
     - name: Set up SSH
       uses: webfactory/ssh-agent@v0.5.3

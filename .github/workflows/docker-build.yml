@@ -1,27 +1,29 @@
-name: Build and Push Docker Image
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout source
-      uses: actions/checkout@v3
-
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-    - name: Build and Push Docker Image
-      uses: docker/build-push-action@v5
-      with:
-        context: 
-        push: true
-        tags: exod0s/nomnomnom:latest
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nomnomnom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nomnomnom
+  template:
+    metadata:
+      labels:
+        app: nomnomnom
+    spec:
+      containers:
+        - name: nomnomnom
+          image: exod0s/nomnomnom:latest  # ✅ Docker Hub Image
+          ports:
+            - containerPort: 4000
+          env:
+            - name: PHX_HOST
+              value: "nomnomnom.live"
+            - name: DATABASE_URL
+              value: "ecto://nomnomnom:secret@172.16.0.200:5432/nomnomnom_dev"
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: nomnomnom-secrets
+                  key: secret_key_base

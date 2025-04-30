@@ -12,11 +12,9 @@ spec:
       labels:
         app: nomnomnom
     spec:
-      imagePullSecrets:
-        - name: ghcr-login
       containers:
         - name: nomnomnom
-          image: ghcr.io/arnewaschenbach/nomnomnom:latest
+          image: exod0s/nomnomnom:latest  # ✅ Docker Hub Image
           ports:
             - containerPort: 4000
           env:

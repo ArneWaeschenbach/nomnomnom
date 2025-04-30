@@ -34,8 +34,7 @@ RUN mix deps.get --only prod
 
 RUN npm --version
 RUN node --version
-# Compile assets
-RUN npm install --prefix ./apps/frontend/assets
+
 
 
 RUN mix compile
